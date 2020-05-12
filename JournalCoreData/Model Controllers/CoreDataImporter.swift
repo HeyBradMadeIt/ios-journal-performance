@@ -18,6 +18,7 @@ class WatchTimer {
 
     init() {
         startTime = CFAbsoluteTimeGetCurrent()
+        print("The task begins")
     }
 
     func stop() -> CFAbsoluteTime {
@@ -47,12 +48,27 @@ class CoreDataImporter {
         self.context.perform {
             
             let identifiers = entries.compactMap { $0.identifier }
+            
+       //     print("THESE ARE IDENTIFIERS: \(identifiers)")
+            
             let array = self.entriesFromPersistentStore(with: identifiers, in: self.context)
+            
+        //    print("THIS IS ARRAY: \(array)")
             
             for entryRep in entries {
                 
+            //    print("THIS IS ENTRYREP: \(entryRep)")
+                
+                if let index = array.firstIndex (where: { $0.identifier == entryRep.identifier }) {
+                    if array[index].identifier == entryRep.identifier {
+                        self.update(entry: array[index], with: entryRep)
+                    }
+                } else {
+                    _ = Entry(entryRepresentation: entryRep, context: self.context)
+                }
+
             }
-            
+            /*
             for entryRep in entries {
                 guard let identifier = entryRep.identifier else { continue }
                 
@@ -63,6 +79,7 @@ class CoreDataImporter {
                     _ = Entry(entryRepresentation: entryRep, context: self.context)
                 }
             }
+ */
             print("The task took \(timer.stop()) seconds.")
             completion(nil)
         }
